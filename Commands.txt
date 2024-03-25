@@ -1,0 +1,56 @@
+wget https://archive.apache.org/dist/kafka/3.3.1/kafka_2.13-3.3.1.tgz
+tar -xvf kafka_2.13-3.3.1.tgz
+
+-----------------------
+java -version
+sudo yum install java-1.8.0-openjdk
+java -version
+cd kafka_2.13-3.3.1
+
+Change the ADVERTISED_LISTENERS property in server.properties file
+------------------------------------------------------------------
+It is pointing to private server , change server.properties so that it can run in public IP
+-   Do a "sudo nano config/server.properties"
+-   Change ADVERTISED_LISTENERS to public ip of the EC2 instance
+-   Then to save & exit:
+        CTRL+Z, Y, Enter
+
+Start Zoo-keeper:
+-------------------------------
+bin/zookeeper-server-start.sh config/zookeeper.properties
+
+// to stop: bin/zookeeper-server-stop.sh config/zookeeper.properties
+
+Open another window to start kafka
+And ssh to to your ec2 machine as done above
+
+Start Kafka-server:
+----------------------------------------
+Duplicate the session & enter in a new console --
+export KAFKA_HEAP_OPTS="-Xmx256M -Xms128M"
+cd kafka_2.13-3.3.1
+bin/kafka-server-start.sh config/server.properties
+
+// to stop: bin/kafka-server-stop.sh config/server.properties
+
+
+Create the topic:
+-----------------------------
+Duplicate the session & enter in a new console --
+cd kafka_2.13-3.3.1
+bin/kafka-topics.sh --create --topic demo_testing2 --bootstrap-server 54.82.101.96:9092 --replication-factor 1 --partitions 1
+                                                                      (Public IP of EC2)
+# replace public IP above
+
+
+Start Producer:
+--------------------------
+bin/kafka-console-producer.sh --topic demo_testing2 --bootstrap-server 54.82.101.96:9092
+# replace public IP above
+
+Start Consumer:
+-------------------------
+Duplicate the session & enter in a new console --
+cd kafka_2.13-3.3.1
+bin/kafka-console-consumer.sh --topic demo_testing2 --bootstrap-server 54.82.101.96:9092
+# replace public IP above
